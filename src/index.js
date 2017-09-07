@@ -1,21 +1,23 @@
+/* global fetch */
+
 console.log('loaded!')
 
 import './sass/index'
+import loadItems from './functions/loadItems';
 
 const toDoList = document.querySelector('.to-do-list');
 const toDoInput = document.querySelector('.input-to-do');
 const button = document.querySelector('.btn-to-do');
 
 window.onload = function windowLoad () {
-    const toDoList = JSON.parse(window.localStorage.getItem('toDos'));
-    // console.log(toDoList);
-    if (!toDoList) {
-        return;
-    }
-    
-    for (let i = 0;i < toDoList.length;i++) {
-        button.onclick(undefined, toDoList[i]);
-    }
+    fetch('//' + window.location.hostname + ':8081', {
+        method: 'GET',
+    }).then(function(r) {
+        return r.text().then(function(text) {
+            return text ? JSON.parse(text) : [];
+        });
+    }).then(loadItems(button))
+    .catch(loadItems(button));
 }
 
 function dropDownList () {
@@ -27,6 +29,9 @@ function dropDownList () {
 
 let toDoArray = [];
 function removeToDo () {
+    const baseURI = '//' + window.location.hostname + ':8081/delete?description=';
+    fetch(`${baseURI}${this.parentNode.children[0].innerText}`);
+    
     toDoList.removeChild(this.parentNode);
     toDoArray = [];
     
@@ -38,6 +43,7 @@ function removeToDo () {
 }
 
 function createToDoItem (item) {
+    const baseURI = '//' + window.location.hostname + ':8081/update?previous=';
     // add to do...
     const toDoContainer = document.createElement('dt');
     toDoContainer.classList.add('to-do-container');
@@ -58,11 +64,49 @@ function createToDoItem (item) {
     remove.onclick = removeToDo;
     toDoContainer.appendChild(remove);
     toDoList.appendChild(toDoContainer);
+    
+    const save = document.createElement('div');
+    save.classList.add('hidden');
+    save.classList.add('drop-down-btn');
+    save.innerText = 'S';
+    save.onclick = function(e) {
+        // fetch PUT changes
+        fetch(`${baseURI}${currentValue}&next=${this.parentElement.children[0].innerText}`);
+        save.classList.add('hidden');
+    };
+    toDoContainer.appendChild(save);
+    
+    let currentValue = item;
+    
+    toDo.setAttribute('contenteditable', 'true');
+    toDo.onfocus = function() {
+        save.classList.remove('hidden');
+        currentValue = this.innerText;
+    };
+    
+    toDo.onblur = function() {
+        setTimeout(function() {
+            if (toDo.innerText === currentValue) {
+                save.classList.add('hidden');
+            } 
+        }, 100);
+    }
 }
 
 button.onclick = function addItem (e, toDoItem) {
     if (e) {
         e.preventDefault();
+        
+        fetch('//' + window.location.hostname + ':8081', {
+            method: 'POST',
+            body: new FormData(document.querySelector('form')),
+        }).then(function(r) {
+            return r.text().then(function(text) {
+                return text ? JSON.parse(text) : {};
+            });
+        }).then(function(j) {
+            console.log('RESPONSE', j);
+        });
     }
     
     let item = toDoItem ? toDoItem : toDoInput.value;

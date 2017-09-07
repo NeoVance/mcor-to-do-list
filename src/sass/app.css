@@ -1,0 +1,69 @@
+.hidden {
+  display: none; }
+
+.app-container {
+  margin: 0 auto;
+  width: 400px;
+  border: 1px solid #ccc; }
+  .app-container .title {
+    padding: 20px;
+    font-size: 20px; }
+  .app-container .form-container {
+    display: flex;
+    margin: 0 20px 20px 20px; }
+    .app-container .form-container .input-to-do {
+      flex: 1;
+      padding: 0 0 0 5px;
+      height: 30px;
+      border: 1px solid #ccc;
+      border-width: 1px 0 1px 1px; }
+    .app-container .form-container .btn-to-do {
+      width: 60px;
+      background: lightblue;
+      border: 1px solid #ccc; }
+  .app-container .list-container {
+    margin: 0 20px 20px 20px;
+    border: 1px solid red; }
+    .app-container .list-container .to-do-list {
+      margin: 0;
+      border: 1px solid green;
+      counter-reset: to-do-counter; }
+      .app-container .list-container .to-do-list .to-do-container {
+        display: flex;
+        flex-wrap: wrap;
+        border: 1px solid blue; }
+      .app-container .list-container .to-do-list .to-do {
+        display: flex;
+        flex: 1;
+        line-height: 30px;
+        white-space: nowrap;
+        overflow: hidden;
+        border: 1px solid red; }
+        .app-container .list-container .to-do-list .to-do:before {
+          content: counter(to-do-counter);
+          counter-increment: to-do-counter;
+          display: flex;
+          flex: none;
+          justify-content: center;
+          align-content: center;
+          height: 30px;
+          width: 30px;
+          border: 1px solid red; }
+      .app-container .list-container .to-do-list .remove {
+        width: 30px;
+        line-height: 30px;
+        text-align: center;
+        border: 1px solid green; }
+      .app-container .list-container .to-do-list .drop-down-btn {
+        width: 30px;
+        line-height: 30px;
+        text-align: center;
+        border: 1px solid green; }
+      .app-container .list-container .to-do-list .drop-down-list {
+        padding: 15px 0;
+        width: 100%;
+        border: 1px solid blue; }
+  .app-container .error::placeholder {
+    color: red; }
+
+/*# sourceMappingURL=app.css.map */
