@@ -17,6 +17,9 @@
       height: 30px;
       border: 1px solid #ccc;
       border-width: 1px 0 1px 1px; }
+      .app-container .form-container .input-to-do.invalid {
+        border-color: red;
+        color: red; }
     .app-container .form-container .btn-to-do {
       width: 60px;
       background: lightblue;

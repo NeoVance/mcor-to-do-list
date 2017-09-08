@@ -4,13 +4,17 @@ console.log('loaded!')
 
 import './sass/index'
 import loadItems from './functions/loadItems';
+import validateInput from './functions/validateInput';
 
 const toDoList = document.querySelector('.to-do-list');
 const toDoInput = document.querySelector('.input-to-do');
 const button = document.querySelector('.btn-to-do');
 
+toDoInput.onkeyup = validateInput(button);
+
 window.onload = function windowLoad () {
-    fetch('//' + window.location.hostname + ':8081', {
+    button.setAttribute('disabled', 'true');
+    fetch('//' + window.location.hostname + ':8081/list', {
         method: 'GET',
     }).then(function(r) {
         return r.text().then(function(text) {
@@ -22,15 +26,29 @@ window.onload = function windowLoad () {
 
 function dropDownList () {
     console.log('dropDownList');
-    const dropDownList = document.createElement('div');
-    dropDownList.classList.add('drop-down-list');
-    this.parentNode.appendChild(dropDownList);
+    const self = this;
+    
+    fetch('//' + window.location.hostname + ':8081/item', {
+        method: 'POST',
+        body: JSON.stringify({
+            list: this.parentNode.children[0].innerText,
+            desc: ''
+        })
+    }).then(function (r) {
+        return r.json();
+    }).then(function(j) {
+        if (j.success) {
+            const dropDownList = document.createElement('div');
+            dropDownList.classList.add('drop-down-list');
+            self.parentNode.appendChild(dropDownList);
+        }
+    });
 }
 
 let toDoArray = [];
 function removeToDo () {
-    const baseURI = '//' + window.location.hostname + ':8081/delete?description=';
-    fetch(`${baseURI}${this.parentNode.children[0].innerText}`);
+    const baseURI = '//' + window.location.hostname + ':8081/list/delete?description=';
+    fetch(`${baseURI}${encodeURIComponent(this.parentNode.children[0].innerText)}`);
     
     toDoList.removeChild(this.parentNode);
     toDoArray = [];
@@ -43,7 +61,7 @@ function removeToDo () {
 }
 
 function createToDoItem (item) {
-    const baseURI = '//' + window.location.hostname + ':8081/update?previous=';
+    const baseURI = '//' + window.location.hostname + ':8081/list/update?previous=';
     // add to do...
     const toDoContainer = document.createElement('dt');
     toDoContainer.classList.add('to-do-container');
@@ -65,13 +83,13 @@ function createToDoItem (item) {
     toDoContainer.appendChild(remove);
     toDoList.appendChild(toDoContainer);
     
-    const save = document.createElement('div');
+    const save = document.createElement('button');
     save.classList.add('hidden');
     save.classList.add('drop-down-btn');
     save.innerText = 'S';
     save.onclick = function(e) {
         // fetch PUT changes
-        fetch(`${baseURI}${currentValue}&next=${this.parentElement.children[0].innerText}`);
+        fetch(`${baseURI}${encodeURIComponent(currentValue)}&next=${this.parentElement.children[0].innerText}`);
         save.classList.add('hidden');
     };
     toDoContainer.appendChild(save);
@@ -79,6 +97,8 @@ function createToDoItem (item) {
     let currentValue = item;
     
     toDo.setAttribute('contenteditable', 'true');
+    toDo.onkeyup = validateInput(save, true);
+    
     toDo.onfocus = function() {
         save.classList.remove('hidden');
         currentValue = this.innerText;
@@ -97,7 +117,7 @@ button.onclick = function addItem (e, toDoItem) {
     if (e) {
         e.preventDefault();
         
-        fetch('//' + window.location.hostname + ':8081', {
+        fetch('//' + window.location.hostname + ':8081/list', {
             method: 'POST',
             body: new FormData(document.querySelector('form')),
         }).then(function(r) {

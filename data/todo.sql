@@ -22,3 +22,4 @@ CREATE TABLE `user` (
 ALTER TABLE `list` ADD CONSTRAINT `list_fk0` FOREIGN KEY (`user_id`) REFERENCES `user`(`id`);
 
 ALTER TABLE `item` ADD CONSTRAINT `item_fk0` FOREIGN KEY (`list_id`) REFERENCES `list`(`id`);
+ALTER TABLE item ADD COLUMN complete boolean NOT NULL;
